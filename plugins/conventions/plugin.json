@@ -1,0 +1,16 @@
+{
+  "name": "conventions",
+  "version": "1.0.0",
+  "components": [],
+  "conventions": [
+    {
+      "name": "gitflow",
+      "prefixes": [
+        "feature/{slug}",
+        "bugfix/{slug}",
+        "release/{slug}",
+        "hotfix/{slug}"
+      ]
+    }
+  ]
+}

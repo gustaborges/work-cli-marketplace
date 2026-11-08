@@ -5,6 +5,7 @@ install the plugins you want:
 
 ```sh
 work plugin marketplace add https://github.com/gustaborges/work-cli-marketplace.git
+work plugin add conventions@work
 work plugin add github@work
 work plugin add wsp@work
 ```
@@ -17,14 +18,25 @@ upgrade work` refreshes what is offered; `work plugin update --check` and
 
 | Plugin | Components |
 | --- | --- |
+| `conventions` | Gitflow branch naming convention |
 | `github` | `work start <pull request URL>` / `<issue URL>` starters; pull request and issue linkers; importers for the pull request description, comments and diff and for the issue (only when the Work has the matching link) |
 | `wsp` | repository locator backed by `wsp find` (requires the `wsp` CLI) |
 
-Both need `python3`; `github` uses the `gh` CLI when available (needed for
+The `github` and `wsp` plugins need `python3`; `github` uses the `gh` CLI when available (needed for
 private repositories) and falls back to the public REST API for the starters.
 
 Each plugin is a self-contained directory under `plugins/`, listed in
 `marketplace.json`.
+
+## Branch naming conventions
+
+`conventions@work/gitflow` offers `feature/{slug}`, `bugfix/{slug}`,
+`release/{slug}`, and `hotfix/{slug}`. These patterns provide branch names;
+they do not enforce Gitflow's branching or merging workflow.
+
+If you used `github@work/gitflow`, install `conventions@work` and update your
+configuration to refer to `conventions@work/gitflow`. The GitHub plugin no
+longer supplies the convention.
 
 ## What the github importers write
 

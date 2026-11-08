@@ -5,6 +5,11 @@
   "description": "Plugins for the Work CLI",
   "plugins": [
     {
+      "name": "conventions",
+      "path": "plugins/conventions",
+      "description": "Branch naming conventions"
+    },
+    {
       "name": "github",
       "path": "plugins/github",
       "description": "Start from and link GitHub pull requests and issues"
