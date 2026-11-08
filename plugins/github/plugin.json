@@ -1,0 +1,59 @@
+{
+  "name": "github",
+  "version": "1.0.0",
+  "components": [
+    {
+      "name": "github-pr-starter",
+      "role": "starter",
+      "entrypoint": "bin/github-pr-starter.py",
+      "runtime": "python3",
+      "pattern": "^https://github\\.com/[^/]+/[^/]+/pull/[0-9]+/?$"
+    },
+    {
+      "name": "github-issue-starter",
+      "role": "starter",
+      "entrypoint": "bin/github-issue-starter.py",
+      "runtime": "python3",
+      "pattern": "^https://github\\.com/[^/]+/[^/]+/issues/[0-9]+/?$"
+    },
+    {
+      "name": "github-pr-linker",
+      "role": "linker",
+      "key": "github.pull_request",
+      "entrypoint": "bin/github-pr-linker.py",
+      "runtime": "python3",
+      "discover": {
+        "automatic": true,
+        "on": [{ "event": "start:finalized" }],
+        "inputs": ["work:worktree_path"]
+      },
+      "manual": {
+        "display_name": "GitHub pull request",
+        "description": "Links the pull request of the current branch"
+      }
+    },
+    {
+      "name": "github-issue-linker",
+      "role": "linker",
+      "key": "github.issue",
+      "entrypoint": "bin/github-issue-linker.py",
+      "runtime": "python3",
+      "discover": {
+        "automatic": true,
+        "on": [{ "event": "start:finalized" }],
+        "inputs": [
+          "work:worktree_path",
+          "work:branch:optional",
+          "link:github.pull_request:optional"
+        ]
+      },
+      "manual": {
+        "display_name": "GitHub issue",
+        "description": "Links the issue the pull request closes or the branch names"
+      }
+    }
+  ],
+  "conventions": [
+    { "name": "gitflow", "prefixes": ["feature/{slug}", "bugfix/{slug}"] }
+  ]
+}
