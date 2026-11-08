@@ -90,3 +90,21 @@ def write(output_dir, relpath, text):
 def quote(text):
     text = (text or "").strip()
     return "\n".join(f"> {line}" if line else ">" for line in text.splitlines()) or ">"
+
+
+def parse_target(component, inputs, key, regex, label):
+    """Return (owner, repo, number) from a delivered link input."""
+    url = str(inputs.get(key, "")).strip()
+    m = regex.match(url)
+    if not m:
+        fail(component, f"input {key} is not a GitHub {label} URL: {url!r}")
+    owner, repo, number = m.groups()
+    return owner, repo, int(number)
+
+
+def who(user):
+    return "@" + user["login"] if user and user.get("login") else "unknown"
+
+
+def comment_block(heading, author, when, body):
+    return f"### {heading} by {who(author)} ({when})\n\n{(body or '').strip() or '_(no text)_'}\n"
