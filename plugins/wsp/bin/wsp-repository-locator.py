@@ -6,15 +6,21 @@ Protocol (specs/004-local-clone-locator/contracts/repository-locator.md):
           "repository_roots": [...]}
   stdout {"matches": [{"repo_path": "<abs>"}, ...]}
 
-Each accepted field is looked up with `wsp find <text> --json`; only the
+Each accepted field is looked up with `wsp find <text> --json` (clone URLs
+are reduced to the "owner/repo" form the index stores); only the
 `repositories` hits are used. Results are returned unranked; the core
 validates, dedups and asks the user when several remain. `repository_roots`
 is ignored: wsp's index, not the filesystem, is the source of truth here.
 """
 import json
 import os
+import re
 import subprocess
 import sys
+
+# https://host/owner/repo(.git), ssh://git@host/owner/repo and git@host:owner/repo
+# all name the same repository; the wsp index records it as "owner/repo".
+URL_RE = re.compile(r"^(?:[a-z][a-z0-9+.-]*://)?(?:[^@/]+@)?[^/:]+[:/]([^/]+/[^/]+?)(?:\.git)?/?$", re.I)
 
 
 def fail(msg):
@@ -43,7 +49,10 @@ def main():
     except (json.JSONDecodeError, AttributeError):
         fail("invalid input: not a JSON object")
 
-    terms = list(repo.get("git_fetch_urls") or [])
+    terms = []
+    for url in repo.get("git_fetch_urls") or []:
+        m = URL_RE.match(url)
+        terms.append(m.group(1) if m else url)
     for key in ("name", "query"):
         if repo.get(key):
             terms.append(repo[key])
