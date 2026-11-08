@@ -90,3 +90,38 @@ def write(output_dir, relpath, text):
 def quote(text):
     text = (text or "").strip()
     return "\n".join(f"> {line}" if line else ">" for line in text.splitlines()) or ">"
+
+
+REMOTE_RE = re.compile(r"github\.com[:/]([^/]+)/([^/]+?)(?:\.git)?/?$")
+
+
+def git_out(cwd, *args):
+    try:
+        proc = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    except FileNotFoundError:
+        return None
+    return proc.stdout.strip() if proc.returncode == 0 else None
+
+
+def origin_repo(cwd):
+    """(owner, repo) of the worktree's origin remote, or None when not GitHub."""
+    m = REMOTE_RE.search(git_out(cwd, "remote", "get-url", "origin") or "")
+    return m.groups() if m else None
+
+
+def rest_branch_pull_request(cwd):
+    """URL of the pull request whose head is the worktree's branch, via REST.
+
+    Fallback for machines where gh is missing or not logged in; open pull
+    requests win over closed or merged ones, like `gh pr view`.
+    """
+    repo = origin_repo(cwd)
+    branch = git_out(cwd, "rev-parse", "--abbrev-ref", "HEAD")
+    if not repo or not branch or branch == "HEAD":
+        return None
+    owner, name = repo
+    for state in ("open", "all"):
+        found = api(f"repos/{owner}/{name}/pulls?head={owner}:{branch}&state={state}&per_page=1")
+        if found:
+            return found[0]["html_url"]
+    return None

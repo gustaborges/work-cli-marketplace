@@ -40,9 +40,16 @@ def issue_from_branch(worktree, branch):
     if not m:
         return None
     proc = _gh.gh_in(worktree, ["issue", "view", m.group(1), "--json", "url"])
-    if proc is None or proc.returncode != 0:
-        return None  # the number is not an issue of this repository
-    url = json.loads(proc.stdout).get("url") or ""
+    if proc is not None and proc.returncode == 0:
+        url = json.loads(proc.stdout).get("url") or ""
+    else:  # gh missing, not logged in, or not an issue here: ask the public API
+        repo = _gh.origin_repo(worktree)
+        if not repo:
+            return None
+        try:
+            url = _gh.api(f"repos/{repo[0]}/{repo[1]}/issues/{m.group(1)}").get("html_url") or ""
+        except (SystemExit, ValueError):
+            return None
     return url if _gh.ISSUE_URL_RE.match(url) else None
 
 
