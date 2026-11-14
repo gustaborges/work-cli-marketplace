@@ -1,6 +1,6 @@
 {
   "name": "github",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "components": [
     {
       "name": "github-pr-starter",
@@ -22,17 +22,6 @@
       "key": "github.pull_request",
       "entrypoint": "bin/github-pr-linker.py",
       "runtime": "python3",
-      "discover": {
-        "automatic": true,
-        "on": [
-          {
-            "event": "start:finalized"
-          }
-        ],
-        "inputs": [
-          "work:worktree_path"
-        ]
-      },
       "manual": {
         "display_name": "GitHub pull request",
         "description": "Links the pull request of the current branch"
