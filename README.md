@@ -19,7 +19,7 @@ upgrade work` refreshes what is offered; `work plugin update --check` and
 | Plugin | Components |
 | --- | --- |
 | `conventions` | Gitflow branch naming convention |
-| `github` | `work start <pull request URL>` / `<issue URL>` starters; pull request and issue linkers; importers for the pull request description, comments and diff and for the issue (only when the Work has the matching link) |
+| `github` | `work start <pull request URL>` / `<issue URL>` starters; pull request linker (manual only: `work link github-pr-linker <url>`; a plain start never guesses a pull request) and issue linker; importers for the pull request description, comments and diff and for the issue (only when the Work has the matching link) |
 | `wsp` | repository locator backed by `wsp find` (requires the `wsp` CLI) |
 
 The `github` and `wsp` plugins need `python3`; `github` uses the `gh` CLI when available (needed for
