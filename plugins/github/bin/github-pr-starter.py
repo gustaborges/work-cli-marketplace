@@ -9,8 +9,7 @@
 `base_branch` is the PR's head branch: in contribution mode it is the branch
 to check out, in fork mode the branch the new Work starts from. The repository
 is the *head* repo when the PR comes from a fork (that is where the branch
-lives), otherwise the base repo. The pull request itself is published as the
-`github.pull_request` link and its number as metadata.
+lives), otherwise the base repo. The source PR is shared; its relationship depends on the selected mode.
 """
 import json
 import sys
@@ -48,7 +47,11 @@ def main():
             "base_branch": branch,
             "start_modes": ["contribution", "fork"],
             "meta": {"github.pull_request.number": int(number)},
-            "links": {"github.pull_request": pr.get("html_url") or arg},
+            "links": {"github.source_pull_request": pr.get("html_url") or arg},
+            "modes": {
+                "contribution": {"links": {"github.pull_request": pr.get("html_url") or arg}},
+                "fork": {"links": {"github.forked_pull_request": pr.get("html_url") or arg}},
+            },
         },
         sys.stdout,
     )

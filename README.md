@@ -47,8 +47,11 @@ Importers add files beside the worktree, never inside it, and never overwrite:
 | pull request description | `context/github/pull-request/description.md` |
 | pull request comments | `context/github/pull-request/comments.md` |
 | pull request diff | `context/github/pull-request/changes.diff` |
+| forked pull request description | `context/github/forked-pull-request/description.md` |
+| forked pull request comments | `context/github/forked-pull-request/comments.md` |
+| forked pull request diff | `context/github/forked-pull-request/changes.diff` |
 | issue | `context/github/issue/issue.md` |
 
 They run automatically after `work start` when the Work carries a
-`github.pull_request` / `github.issue` link, and on demand with `work import`.
+`github.pull_request`, `github.forked_pull_request`, or `github.issue` link, and on demand with `work import`.
 Importing again is refused while the file exists; remove it first.
