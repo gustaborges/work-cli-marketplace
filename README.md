@@ -19,7 +19,7 @@ upgrade work` refreshes what is offered; `work plugin update --check` and
 | Plugin | Components |
 | --- | --- |
 | `conventions` | Gitflow branch naming convention |
-| `github` | `work start <pull request URL>` / `<issue URL>` starters; pull request and issue linkers; importers for the pull request description, comments and diff and for the issue (only when the Work has the matching link) |
+| `github` | `work start <pull request URL>` / `<issue URL>` starters; pull request linker (manual only: `work link github-pr-linker <url>`; a plain start never guesses a pull request) and issue linker; importers for the pull request description, comments and diff and for the issue (only when the Work has the matching link) |
 | `wsp` | repository locator backed by `wsp find` (requires the `wsp` CLI) |
 
 The `github` and `wsp` plugins need `python3`; `github` uses the `gh` CLI when available (needed for
@@ -47,8 +47,11 @@ Importers add files beside the worktree, never inside it, and never overwrite:
 | pull request description | `context/github/pull-request/description.md` |
 | pull request comments | `context/github/pull-request/comments.md` |
 | pull request diff | `context/github/pull-request/changes.diff` |
+| forked pull request description | `context/github/forked-pull-request/description.md` |
+| forked pull request comments | `context/github/forked-pull-request/comments.md` |
+| forked pull request diff | `context/github/forked-pull-request/changes.diff` |
 | issue | `context/github/issue/issue.md` |
 
 They run automatically after `work start` when the Work carries a
-`github.pull_request` / `github.issue` link, and on demand with `work import`.
+`github.pull_request`, `github.forked_pull_request`, or `github.issue` link, and on demand with `work import`.
 Importing again is refused while the file exists; remove it first.

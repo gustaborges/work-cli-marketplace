@@ -141,3 +141,73 @@ def rest_branch_pull_request(cwd):
         if found:
             return found[0]["html_url"]
     return None
+
+
+def import_pr_description(component, key, folder):
+    data = read_stdin(component)
+    owner, repo, number = parse_target(
+        component, data.get("inputs", {}), key, PR_URL_RE, "pull request"
+    )
+    pr = api(f"repos/{owner}/{repo}/pulls/{number}")
+    labels = ", ".join(l["name"] for l in pr.get("labels", [])) or "none"
+    head = pr.get("head", {})
+    text = (
+        f"# {pr['title']} (#{number})\n\n"
+        f"- URL: {pr['html_url']}\n"
+        f"- State: {'merged' if pr.get('merged_at') else pr['state']}"
+        f"{' (draft)' if pr.get('draft') else ''}\n"
+        f"- Author: {who(pr.get('user'))}\n"
+        f"- Branch: {head.get('label')} -> {pr.get('base', {}).get('label')}\n"
+        f"- Labels: {labels}\n\n"
+        f"{(pr.get('body') or '').strip() or '_(no description)_'}\n"
+    )
+    write(data["output_dir"], f"context/github/{folder}/description.md", text)
+
+
+
+def _pr_section(title, blocks):
+    body = "\n".join(blocks) if blocks else "_none_\n"
+    return f"## {title}\n\n{body}\n"
+
+
+
+def import_pr_comments(component, key, folder):
+    data = read_stdin(component)
+    owner, repo, number = parse_target(
+        component, data.get("inputs", {}), key, PR_URL_RE, "pull request"
+    )
+    base = f"repos/{owner}/{repo}"
+    reviews = [r for r in paginate(f"{base}/pulls/{number}/reviews")
+               if (r.get("body") or "").strip() or r.get("state") != "COMMENTED"]
+    inline = paginate(f"{base}/pulls/{number}/comments")
+    general = paginate(f"{base}/issues/{number}/comments")
+
+    def when(item, key):
+        return item.get(key) or ""
+
+    text = f"# Pull request #{number}: conversation\n\n" + _pr_section(
+        "Reviews",
+        [comment_block(r["state"].lower().replace("_", " "), r.get("user"),
+                           when(r, "submitted_at"), r.get("body"))
+         for r in sorted(reviews, key=lambda r: when(r, "submitted_at"))],
+    ) + _pr_section(
+        "Inline comments",
+        [comment_block(f"{c['path']}:{c.get('line') or c.get('original_line') or '?'}",
+                           c.get("user"), when(c, "created_at"), c.get("body"))
+         for c in sorted(inline, key=lambda c: when(c, "created_at"))],
+    ) + _pr_section(
+        "General comments",
+        [comment_block("comment", c.get("user"), when(c, "created_at"), c.get("body"))
+         for c in sorted(general, key=lambda c: when(c, "created_at"))],
+    )
+    write(data["output_dir"], f"context/github/{folder}/comments.md", text)
+
+
+
+def import_pr_diff(component, key, folder):
+    data = read_stdin(component)
+    owner, repo, number = parse_target(
+        component, data.get("inputs", {}), key, PR_URL_RE, "pull request"
+    )
+    diff = api(f"repos/{owner}/{repo}/pulls/{number}", accept="application/vnd.github.diff")
+    write(data["output_dir"], f"context/github/{folder}/changes.diff", diff)

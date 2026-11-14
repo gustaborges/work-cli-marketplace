@@ -1,6 +1,6 @@
 {
   "name": "github",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "components": [
     {
       "name": "github-pr-starter",
@@ -22,17 +22,6 @@
       "key": "github.pull_request",
       "entrypoint": "bin/github-pr-linker.py",
       "runtime": "python3",
-      "discover": {
-        "automatic": true,
-        "on": [
-          {
-            "event": "start:finalized"
-          }
-        ],
-        "inputs": [
-          "work:worktree_path"
-        ]
-      },
       "manual": {
         "display_name": "GitHub pull request",
         "description": "Links the pull request of the current branch"
@@ -132,6 +121,60 @@
       },
       "inputs": [
         "link:github.issue"
+      ]
+    },
+    {
+      "name": "github-forked-pr-description-importer",
+      "role": "importer",
+      "entrypoint": "bin/github-forked-pr-description-importer.py",
+      "runtime": "python3",
+      "on": [
+        {
+          "event": "start:finalized"
+        }
+      ],
+      "manual": {
+        "display_name": "Forked pull request description",
+        "description": "Saves the title and description of the forked pull request"
+      },
+      "inputs": [
+        "link:github.forked_pull_request"
+      ]
+    },
+    {
+      "name": "github-forked-pr-comments-importer",
+      "role": "importer",
+      "entrypoint": "bin/github-forked-pr-comments-importer.py",
+      "runtime": "python3",
+      "on": [
+        {
+          "event": "start:finalized"
+        }
+      ],
+      "manual": {
+        "display_name": "Forked pull request comments",
+        "description": "Saves the reviews and comments of the forked pull request"
+      },
+      "inputs": [
+        "link:github.forked_pull_request"
+      ]
+    },
+    {
+      "name": "github-forked-pr-diff-importer",
+      "role": "importer",
+      "entrypoint": "bin/github-forked-pr-diff-importer.py",
+      "runtime": "python3",
+      "on": [
+        {
+          "event": "start:finalized"
+        }
+      ],
+      "manual": {
+        "display_name": "Forked pull request diff",
+        "description": "Saves the diff of the forked pull request"
+      },
+      "inputs": [
+        "link:github.forked_pull_request"
       ]
     }
   ],
