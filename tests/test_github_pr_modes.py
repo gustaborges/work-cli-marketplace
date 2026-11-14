@@ -28,7 +28,7 @@ class PullRequestModesTest(unittest.TestCase):
     def test_starter_publishes_distinct_mode_links(self):
         with patch.object(_gh, 'api', return_value=PR):
             result = json.loads(self.run_script('github-pr-starter', {'arg': URL}))
-        self.assertEqual(result['links'], {'github.source_pull_request': URL})
+        self.assertNotIn('links', result)
         self.assertEqual(result['modes']['contribution']['links'], {'github.pull_request': URL})
         self.assertEqual(result['modes']['fork']['links'], {'github.forked_pull_request': URL})
 
